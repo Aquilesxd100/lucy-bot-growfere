@@ -1,4 +1,5 @@
-﻿using bot_lucy_growfere.Secrets;
+﻿using bot_lucy_growfere.commands;
+using bot_lucy_growfere.Secrets;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using System;
@@ -31,13 +32,26 @@ namespace bot_lucy_growfere
 
             Client.Ready += Client_Ready;
 
+            var commandsConfig = new CommandsNextConfiguration()
+            {
+                StringPrefixes = new string[] { "!" },
+                EnableMentionPrefix = true,
+                EnableDms = true,
+                EnableDefaultHelp = false,
+            };
+
+            Commands = Client.UseCommandsNext(commandsConfig);
+
+            Commands.RegisterCommands<Commands>();
+
             await Client.ConnectAsync();
             await Task.Delay(-1);
         }
         private static Task Client_Ready(
             DiscordClient sender,
             DSharpPlus.EventArgs.ReadyEventArgs args
-        ) {
+        )
+        {
             return Task.CompletedTask;
         }
     }
