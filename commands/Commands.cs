@@ -75,15 +75,16 @@ namespace bot_lucy_growfere.commands
         [Command("clearMessages")]
         public async Task ClearMessages(CommandContext ctx, string mensagemADeletar = "mensagem default para deletar")
         {
-            //if (ctx.User is not IGuildUser)
-            //{
-            //    await ctx.Channel.SendMessageAsync($"Somente administradores podem user este comando para deletar mensagens específicas! 🙂");
-            //    return;
-            //}
+            var permissoesUsuario = ctx.Channel.PermissionsFor(ctx.Member);
+            if (permissoesUsuario != DSharpPlus.Permissions.All)
+            {
+                await ctx.Channel.SendMessageAsync($"Somente administradores podem user este comando para deletar mensagens específicas! 🙂");
+                return;
+            }
 
             if (mensagemADeletar.Length < 4)
             {
-                await ctx.Channel.SendMessageAsync($"Digite uma palavra de pelo menos 5 caractéres para ser deletada! 😬");
+                await ctx.Channel.SendMessageAsync($"Digite uma palavra de pelo menos 4 caractéres para ser deletada! 😬");
                 return;
             }
 
