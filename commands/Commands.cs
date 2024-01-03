@@ -36,7 +36,7 @@ namespace bot_lucy_growfere.commands
                     .WithDescription("Esses são meus comandos 😎")
                     .AddField("!info", "Mostra informações de outros comandos.")
                     .AddField("!clearMessages", "Limpa o canal de texto, podendo passar uma parte de texto da mensagem que deseja deletar.")
-                    .AddField("!PR", "Mostra os Mandamentos do PR.")
+                    .AddField("!pr", "Mostra os Mandamentos do PR.")
                     .AddField("!feriados", "Mostra os feriados nacionais do ano, podendo passar uma prop 'prox' para retornar o feriado mais próximo.")
                     .AddField("!trocadilho", "Retorna um pequeno trocadilho engraçado.")
                     .WithColor(new DiscordColor(143, 0, 255));
@@ -73,7 +73,10 @@ namespace bot_lucy_growfere.commands
         }
 
         [Command("clearMessages")]
-        public async Task ClearMessages(CommandContext ctx, string mensagemADeletar = "mensagem default para deletar")
+        public async Task ClearMessages(
+            CommandContext ctx, 
+            string mensagemADeletar = "mensagem default para deletar"
+        )
         {
             var permissoesUsuario = ctx.Channel.PermissionsFor(ctx.Member);
             if (permissoesUsuario != DSharpPlus.Permissions.All)
@@ -94,17 +97,15 @@ namespace bot_lucy_growfere.commands
             foreach (var message in mensagens)
             {
                 if (
-                    message.Content.Contains("https://prod.liveshare") ||
-                    message.Content.Contains("!clearMessages") ||
-                    message.Content.Contains("!info") ||
-                    message.Content.Contains("!PR") ||
-                    message.Content.Contains("!feriados") ||
-                    message.Content.Contains("!trocadilho") ||
-                    message.Content.Contains("Apaguei um total de ") ||
-                    message.Content.Contains("Digite uma palavra de pelo menos 5 caractéres para ser deletada") ||
-                    (
-                        mensagemADeletar.Length >= 4 &&
-                        message.Content.Contains(mensagemADeletar)
+                    message.Content.Length > 0 && (
+                        message.Content.Contains("https://prod.liveshare") ||
+                        message.Content[0] == '!' ||
+                        message.Content.Contains("Apaguei um total de ") ||
+                        message.Content.Contains("Digite uma palavra de pelo menos 5 caractéres para ser deletada") ||
+                        (
+                            mensagemADeletar.Length >= 4 &&
+                            message.Content.Contains(mensagemADeletar)
+                        )
                     )
                 )
                 {
@@ -112,7 +113,6 @@ namespace bot_lucy_growfere.commands
                     await ctx.Channel.DeleteMessageAsync(message);
                 }
             }
-
             await ctx.Channel.SendMessageAsync($"Apaguei um total de {qtdMensagensApagadas} mensagens! 😁");
         }
 
