@@ -44,6 +44,18 @@ namespace bot_lucy_growfere
 
             Commands.RegisterCommands<Commands>();
 
+            var endPointLavaLink = new ConnectionEndpoint
+            {
+                Hostname = "lavalink.lexnet.cc",
+                Port = 443,
+                Secure = true
+            };
+
+            var lavaLinkConfig = new LavalinkConfiguration
+            {
+                Password = "lexn3tl@val!nk"
+            };
+
             await Client.ConnectAsync();
             await Task.Delay(-1);
         }

@@ -155,6 +155,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="database\banco\" />
+    <Folder Include="database\NewFolder1\" />
+    <Folder Include="resources\audios\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
