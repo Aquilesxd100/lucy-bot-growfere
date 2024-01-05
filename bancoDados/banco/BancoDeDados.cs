@@ -2,12 +2,13 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using System;
 using bot_lucy_growfere.models.bancoDados;
+using bot_lucy_growfere.Secrets;
 
 namespace bot_lucy_growfere.database.banco
 {
     public class BancoDeDados
     {
-        private static string connStr = Environment.GetEnvironmentVariable("BANCO_URL");
+        private static string connStr = SecretsReader.dataBaseUrl;
         public static MySqlConnection conexao = new MySqlConnection(connStr);
 
         static public void VerificarConexao()

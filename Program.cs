@@ -1,4 +1,5 @@
 ﻿using bot_lucy_growfere.commands;
+using bot_lucy_growfere.database.banco;
 using bot_lucy_growfere.database.local;
 using bot_lucy_growfere.Secrets;
 using DSharpPlus;
@@ -26,13 +27,12 @@ namespace bot_lucy_growfere
 
         static async Task Main(string[] args)
         {
-            SecretsReader secrets = new SecretsReader();
-            await secrets.GetSecrets();
+            await SecretsReader.GetSecrets();
 
             DiscordConfiguration discordConfig = new DiscordConfiguration()
             {
                 Intents = DiscordIntents.All,
-                Token = secrets.botToken,
+                Token = SecretsReader.botToken,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true
             };
@@ -78,7 +78,7 @@ namespace bot_lucy_growfere
         }
 
         private static async Task Client_VoiceStateUpdated(
-            DiscordClient sender, 
+            DiscordClient sender,
             VoiceStateUpdateEventArgs voiceState
         )
         {
@@ -88,7 +88,7 @@ namespace bot_lucy_growfere
             if (
                 voiceState.User.IsBot
                 || canalDeVoz == null
-                || false/*sender.CurrentUser.Username != BancoLocal.usernameMarcelo*/
+                || sender.CurrentUser.Username != BancoLocal.usernameMarcelo
                 || !lavaLink.ConnectedNodes.Any()
             )
             {
@@ -97,42 +97,71 @@ namespace bot_lucy_growfere
 
             var Fernando_E_Lucas =
                 canalDeVoz.Users.Where(u =>
-                    u.Username == BancoLocal.usernameFernando 
+                    u.Username == BancoLocal.usernameFernando
                     || u.Username == BancoLocal.usernameLucas
                 )
                 .ToArray();
 
             if (
                 Fernando_E_Lucas.Length == 2
-                && true /*Fernando_E_Lucas.All(u => u.VoiceState.IsSelfDeafened)*/
+                && Fernando_E_Lucas.All(u => u.VoiceState.IsSelfDeafened)
+                && !BancoLocal.LucyRecebendoMarcelo
             )
             {
-                bool passou16HorasDoIntervalo = true;
+                string responseBanco = BancoDeDados.GetHoraUltimaMensagemMandada();
+                if (responseBanco == null) { return; }
+                DateTime dataAtual = DateTime.Now;
+                DateTime ultimaVezRecebeuMarcelo = DateTime.Parse(responseBanco);
+                bool passou16HorasDoIntervalo =
+                    dataAtual.CompareTo(
+                        ultimaVezRecebeuMarcelo.AddHours(16)
+                    ) >= 0;
+
                 if (passou16HorasDoIntervalo)
                 {
-                    //ADICIONAR AQUI DELAY DE 4 SEGUNDOS
+                    BancoLocal.LucyRecebendoMarcelo = true;
+                    await Task.Delay(700);
+
                     var nodeLavaLink = lavaLink.ConnectedNodes.Values.First();
                     await nodeLavaLink.ConnectAsync(canalDeVoz);
 
                     var conexao = nodeLavaLink.GetGuildConnection(voiceState.Guild);
-                    if(conexao == null) { return; }
+                    conexao.PlaybackFinished += SairChamadaAposTocarAudioAsync;
+
+                    if (conexao == null) {
+                        BancoLocal.LucyRecebendoMarcelo = false;
+                        return; 
+                    }
 
                     LavalinkLoadResult resultadoPesquisa = await nodeLavaLink.Rest.GetTracksAsync(BancoLocal.codAudioReceberMarcelo);
-                    if(
+                    if (
                         resultadoPesquisa.LoadResultType == LavalinkLoadResultType.NoMatches
                         || resultadoPesquisa.LoadResultType == LavalinkLoadResultType.LoadFailed
                     )
                     {
+                        BancoLocal.LucyRecebendoMarcelo = false;
                         return;
                     }
                     var audio = resultadoPesquisa.Tracks.First();
 
                     await conexao.PlayAsync(audio);
-                } else
+                    BancoDeDados.AtualizarUltimaVezMarceloFoiRecebido(dataAtual);
+                    await Task.Delay(4000);
+                    BancoLocal.LucyRecebendoMarcelo = false;
+                }
+                else
                 {
-                    Console.WriteLine("Marcelo já foi recebido hoje!");
+                    Console.WriteLine("_Lucy: Tentei receber o Marcelo mas ele já foi recebido hoje :c");
                 }
             }
+        }
+
+        private static async Task SairChamadaAposTocarAudioAsync(
+            LavalinkGuildConnection conexao, 
+            DSharpPlus.Lavalink.EventArgs.TrackFinishEventArgs args)
+        {
+            await Task.Delay(1500);
+            conexao.DisconnectAsync();
         }
 
         private static Task Client_Ready(
