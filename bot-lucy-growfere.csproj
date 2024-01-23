@@ -178,10 +178,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="commands\Commands.cs" />
+    <Compile Include="comandos\Comandos.cs" />
     <Compile Include="bancoDados\banco\BancoDeDados.cs" />
     <Compile Include="bancoDados\local\BancoLocal.cs" />
     <Compile Include="bancoDados\local\Trocadilhos.cs" />
+    <Compile Include="controladores\ControladorChamadaVoz.cs" />
     <Compile Include="models\bancoDados\BotDiscord.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

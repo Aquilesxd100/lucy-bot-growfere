@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace bot_lucy_growfere.commands
 {
-    public class Commands : BaseCommandModule
+    public class Comandos : BaseCommandModule
     {
         [Command("ping")]
         public async Task Ping(CommandContext ctx)

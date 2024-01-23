@@ -1,6 +1,7 @@
 ﻿using bot_lucy_growfere.commands;
 using bot_lucy_growfere.database.banco;
 using bot_lucy_growfere.database.local;
+using bot_lucy_growfere.controladores;
 using bot_lucy_growfere.Secrets;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -22,8 +23,8 @@ namespace bot_lucy_growfere
 {
     internal class Program
     {
-        private static DiscordClient Client { get; set; }
-        private static CommandsNextExtension Commands { get; set; }
+        public static DiscordClient Client { get; set; }
+        public static CommandsNextExtension Commands { get; set; }
 
         static async Task Main(string[] args)
         {
@@ -51,9 +52,9 @@ namespace bot_lucy_growfere
 
             Commands = Client.UseCommandsNext(commandsConfig);
 
-            Commands.RegisterCommands<Commands>();
+            Commands.RegisterCommands<Comandos>();
 
-            Client.VoiceStateUpdated += Client_VoiceStateUpdated;
+            Client.VoiceStateUpdated += ControladorChamadaVoz.DeteccaoMudancaEstadoVoz;
 
             var endPointLavaLink = new ConnectionEndpoint
             {
@@ -75,93 +76,6 @@ namespace bot_lucy_growfere
             await lavaLink.ConnectAsync(lavaLinkConfig);
             Console.WriteLine("_Lucy: Oii, estou pronta mais uma vez!");
             await Task.Delay(-1);
-        }
-
-        private static async Task Client_VoiceStateUpdated(
-            DiscordClient sender,
-            VoiceStateUpdateEventArgs voiceState
-        )
-        {
-            LavalinkExtension lavaLink = Client.GetLavalink();
-            DiscordChannel canalDeVoz = voiceState.Channel;
-
-            if (
-                voiceState.User.IsBot
-                || canalDeVoz == null
-                || sender.CurrentUser.Username != BancoLocal.usernameMarcelo
-                || !lavaLink.ConnectedNodes.Any()
-            )
-            {
-                return;
-            }
-
-            var Fernando_E_Lucas =
-                canalDeVoz.Users.Where(u =>
-                    u.Username == BancoLocal.usernameFernando
-                    || u.Username == BancoLocal.usernameLucas
-                )
-                .ToArray();
-
-            if (
-                Fernando_E_Lucas.Length == 2
-                && Fernando_E_Lucas.All(u => u.VoiceState.IsSelfDeafened)
-                && !BancoLocal.LucyRecebendoMarcelo
-            )
-            {
-                string responseBanco = BancoDeDados.GetHoraUltimaMensagemMandada();
-                if (responseBanco == null) { return; }
-                DateTime dataAtual = DateTime.Now;
-                DateTime ultimaVezRecebeuMarcelo = DateTime.Parse(responseBanco);
-                bool passou16HorasDoIntervalo =
-                    dataAtual.CompareTo(
-                        ultimaVezRecebeuMarcelo.AddHours(16)
-                    ) >= 0;
-
-                if (passou16HorasDoIntervalo)
-                {
-                    BancoLocal.LucyRecebendoMarcelo = true;
-                    await Task.Delay(700);
-
-                    var nodeLavaLink = lavaLink.ConnectedNodes.Values.First();
-                    await nodeLavaLink.ConnectAsync(canalDeVoz);
-
-                    var conexao = nodeLavaLink.GetGuildConnection(voiceState.Guild);
-                    conexao.PlaybackFinished += SairChamadaAposTocarAudioAsync;
-
-                    if (conexao == null) {
-                        BancoLocal.LucyRecebendoMarcelo = false;
-                        return; 
-                    }
-
-                    LavalinkLoadResult resultadoPesquisa = await nodeLavaLink.Rest.GetTracksAsync(BancoLocal.codAudioReceberMarcelo);
-                    if (
-                        resultadoPesquisa.LoadResultType == LavalinkLoadResultType.NoMatches
-                        || resultadoPesquisa.LoadResultType == LavalinkLoadResultType.LoadFailed
-                    )
-                    {
-                        BancoLocal.LucyRecebendoMarcelo = false;
-                        return;
-                    }
-                    var audio = resultadoPesquisa.Tracks.First();
-
-                    await conexao.PlayAsync(audio);
-                    BancoDeDados.AtualizarUltimaVezMarceloFoiRecebido(dataAtual);
-                    await Task.Delay(4000);
-                    BancoLocal.LucyRecebendoMarcelo = false;
-                }
-                else
-                {
-                    Console.WriteLine("_Lucy: Tentei receber o Marcelo mas ele já foi recebido hoje :c");
-                }
-            }
-        }
-
-        private static async Task SairChamadaAposTocarAudioAsync(
-            LavalinkGuildConnection conexao, 
-            DSharpPlus.Lavalink.EventArgs.TrackFinishEventArgs args)
-        {
-            await Task.Delay(1500);
-            conexao.DisconnectAsync();
         }
 
         private static Task Client_Ready(
