@@ -33,6 +33,27 @@ namespace bot_lucy_growfere.commands
             await ctx.Channel.SendMessageAsync($"{result}");
         }
 
+        [Command("tempoRefere")]
+        public async Task TempoRefere(CommandContext ctx)
+        {
+            string msgTempoTrabalhado = "";
+            TimeSpan tempoTotalTrabalhado = DateTime.Now.Subtract(BancoLocal.dataInicioEmpregoRefere);
+
+            int mesesTrabalhados = (int)(tempoTotalTrabalhado.TotalDays / 30);
+            if (mesesTrabalhados > 0) msgTempoTrabalhado += $" {mesesTrabalhados} meses";
+
+            tempoTotalTrabalhado = tempoTotalTrabalhado.Subtract(TimeSpan.FromDays(mesesTrabalhados * 30));
+
+            int diasTrabalhados = (int)(tempoTotalTrabalhado.TotalDays);
+            if (diasTrabalhados > 0) {
+                msgTempoTrabalhado += mesesTrabalhados > 0
+                    ? $" e {diasTrabalhados} dias"
+                    : $" {diasTrabalhados} dias";
+            } 
+
+            await ctx.Channel.SendMessageAsync($"Fernando e Lucas já trabalharam{msgTempoTrabalhado} na Refere.");
+        }
+
         [Command("info")]
         public async Task Info(CommandContext ctx)
         {
@@ -46,6 +67,7 @@ namespace bot_lucy_growfere.commands
                     .AddField("!trocadilho", "Retorna um pequeno trocadilho engraçado.")
                     .AddField("!tocar", "Insira esse comando com o nome da musica que deseja tocar. (obs: se o nome tiver mais de uma palavra use _ para separa-lo)")
                     .AddField("!parar", "Usado para parar o tocar.")
+                    .AddField("!tempoRefere", "Mostra quanto tempo o pessoal esta trabalhando na Refere.")
                     .WithColor(new DiscordColor(143, 0, 255));
 
             await ctx.Channel.SendMessageAsync(embed: message);
