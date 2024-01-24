@@ -126,11 +126,11 @@ namespace bot_lucy_growfere.commands
             foreach (var message in mensagens)
             {
                 if (
+                    message.Embeds.Count > 0 ||
                     message.Content.Length > 0 && (
                         message.Content.Contains("https://prod.liveshare") ||
                         message.Content[0] == '!' ||
-                        message.Content.Contains("Apaguei um total de ") ||
-                        message.Content.Contains("Digite uma palavra de pelo menos 5 caractéres para ser deletada") ||
+                        message.Author.IsBot ||
                         (
                             mensagemADeletar.Length >= 4 &&
                             message.Content.Contains(mensagemADeletar)
