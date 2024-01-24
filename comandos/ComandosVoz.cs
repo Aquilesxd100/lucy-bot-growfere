@@ -39,7 +39,7 @@ namespace bot_lucy_growfere.comandos
 
             if (
                 Fernando_E_Lucas.Length == 2
-                && /*Fernando_E_Lucas.All(u => u.VoiceState.IsSelfDeafened)*/true
+                && Fernando_E_Lucas.All(u => u.VoiceState.IsSelfDeafened)
                 && !BancoLocal.LucyRecebendoMarcelo
             )
             {
