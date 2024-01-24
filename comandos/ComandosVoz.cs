@@ -91,7 +91,7 @@ namespace bot_lucy_growfere.comandos
             }
         }
 
-        private static async Task SairChamadaAposTocarAudioAsync(
+        public static async Task SairChamadaAposTocarAudioAsync(
             LavalinkGuildConnection conexao,
             DSharpPlus.Lavalink.EventArgs.TrackFinishEventArgs args
         )

@@ -1,7 +1,11 @@
-﻿using bot_lucy_growfere.database.local;
+﻿using bot_lucy_growfere.comandos;
+using bot_lucy_growfere.controladores;
+using bot_lucy_growfere.database.local;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using DSharpPlus.Lavalink;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,6 +19,7 @@ namespace bot_lucy_growfere.commands
 {
     public class Comandos : BaseCommandModule
     {
+        public static DiscordClient Client { get; set; }
         [Command("ping")]
         public async Task Ping(CommandContext ctx)
         {
@@ -35,10 +40,12 @@ namespace bot_lucy_growfere.commands
                     .WithTitle($"Olá {ctx.User.Username}")
                     .WithDescription("Esses são meus comandos 😎")
                     .AddField("!info", "Mostra informações de outros comandos.")
-                    .AddField("!clearMessages", "Limpa o canal de texto, podendo passar uma parte de texto da mensagem que deseja deletar.")
+                    .AddField("!limparMensagens", "Limpa o canal de texto, podendo passar uma parte de texto da mensagem que deseja deletar.")
                     .AddField("!pr", "Mostra os Mandamentos do PR.")
                     .AddField("!feriados", "Mostra os feriados nacionais do ano, podendo passar uma prop 'prox' para retornar o feriado mais próximo.")
                     .AddField("!trocadilho", "Retorna um pequeno trocadilho engraçado.")
+                    .AddField("!tocar", "Insira esse comando com o nome da musica que deseja tocar. (obs: se o nome tiver mais de uma palavra use _ para separa-lo)")
+                    .AddField("!parar", "Usado para parar o tocar.")
                     .WithColor(new DiscordColor(143, 0, 255));
 
             await ctx.Channel.SendMessageAsync(embed: message);
@@ -72,9 +79,9 @@ namespace bot_lucy_growfere.commands
             await ctx.Channel.SendMessageAsync(embed: message);
         }
 
-        [Command("clearMessages")]
-        public async Task ClearMessages(
-            CommandContext ctx, 
+        [Command("limparMensagens")]
+        public async Task LimparMensagens(
+            CommandContext ctx,
             string mensagemADeletar = "mensagem default para deletar"
         )
         {
@@ -179,6 +186,56 @@ namespace bot_lucy_growfere.commands
             await ctx.Channel.SendMessageAsync($"{trocadilho._pergunta}");
             await Task.Delay(3000);
             await ctx.Channel.SendMessageAsync($"{trocadilho._resposta}");
+        }
+
+        [Command("tocar")]
+        public async Task Tocar(CommandContext ctx, string musica)
+        {
+            if (musica.Length <= 3)
+            {
+                return;
+            }
+
+            musica = musica.Replace('_', ' ');
+
+            LavalinkExtension lavaLink = Program.Client.GetLavalink();
+
+            if (!lavaLink.ConnectedNodes.Any())
+            {
+                return;
+            }
+
+            DiscordChannel canalDeVoz = ctx.Channel;
+            var nodeLavaLink = lavaLink.ConnectedNodes.Values.First();
+            await nodeLavaLink.ConnectAsync(canalDeVoz);
+            var conexao = nodeLavaLink.GetGuildConnection(ctx.Guild);
+            ControladorChamadaVoz.conexaoVoz = conexao;
+
+            if (conexao == null)
+            {
+                return;
+            }
+
+            LavalinkLoadResult resultadoPesquisa = await nodeLavaLink.Rest.GetTracksAsync(musica);
+
+            if (
+                resultadoPesquisa.LoadResultType == LavalinkLoadResultType.NoMatches
+                || resultadoPesquisa.LoadResultType == LavalinkLoadResultType.LoadFailed
+            )
+            {
+                return;
+            }
+
+            var audio = resultadoPesquisa.Tracks.First();
+            conexao.PlaybackFinished += ComandosVoz.SairChamadaAposTocarAudioAsync;
+            await conexao.PlayAsync(audio);
+        }
+
+        [Command("parar")]
+        public async Task Parar()
+        {
+           Console.WriteLine("entrou");
+           ControladorChamadaVoz.conexaoVoz.DisconnectAsync();
         }
     }
 }

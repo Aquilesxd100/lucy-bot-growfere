@@ -2,11 +2,14 @@
 using DSharpPlus;
 using System.Threading.Tasks;
 using bot_lucy_growfere.comandos;
+using DSharpPlus.Lavalink;
 
 namespace bot_lucy_growfere.controladores
 {
     internal static class ControladorChamadaVoz
     {
+        public static LavalinkGuildConnection conexaoVoz { get; set; }
+
         public static async Task DeteccaoMudancaEstadoVoz(
             DiscordClient usuarioQueAtivou,
             VoiceStateUpdateEventArgs estadoDeVoz

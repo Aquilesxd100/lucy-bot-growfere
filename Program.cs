@@ -58,14 +58,14 @@ namespace bot_lucy_growfere
 
             var endPointLavaLink = new ConnectionEndpoint
             {
-                Hostname = "lavalink.teramont.net",
+                Hostname = "lava.dcmusic.ca", 
                 Port = 443,
                 Secured = true
             };
 
             var lavaLinkConfig = new LavalinkConfiguration
             {
-                Password = "eHKuFcz67k4lBS64",
+                Password = "youshallnotpass",
                 RestEndpoint = endPointLavaLink,
                 SocketEndpoint = endPointLavaLink
             };
