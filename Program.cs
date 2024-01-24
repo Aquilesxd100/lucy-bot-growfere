@@ -58,14 +58,14 @@ namespace bot_lucy_growfere
 
             var endPointLavaLink = new ConnectionEndpoint
             {
-                Hostname = "lavalink.lexnet.cc",
+                Hostname = "lavalink.teramont.net",
                 Port = 443,
                 Secured = true
             };
 
             var lavaLinkConfig = new LavalinkConfiguration
             {
-                Password = "lexn3tl@val!nk",
+                Password = "eHKuFcz67k4lBS64",
                 RestEndpoint = endPointLavaLink,
                 SocketEndpoint = endPointLavaLink
             };
