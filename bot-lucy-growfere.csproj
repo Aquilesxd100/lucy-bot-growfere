@@ -182,8 +182,9 @@
     <Compile Include="bancoDados\banco\BancoDeDados.cs" />
     <Compile Include="bancoDados\local\BancoLocal.cs" />
     <Compile Include="bancoDados\local\Trocadilhos.cs" />
+    <Compile Include="comandos\ComandosVoz.cs" />
     <Compile Include="controladores\ControladorChamadaVoz.cs" />
-    <Compile Include="models\bancoDados\BotDiscord.cs" />
+    <Compile Include="modelos\bancoDados\BotDiscord.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Secrets\Secrets.cs" />
@@ -194,8 +195,5 @@
     <None Include="Secrets\secretsData.json" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Content Include="resources\audios\audio_receber_marcelo.mp3" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
