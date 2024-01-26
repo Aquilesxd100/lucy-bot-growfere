@@ -9,6 +9,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -290,8 +291,13 @@ namespace bot_lucy_growfere.commands
                 await ctx.Channel.SendMessageAsync("Nenhum jogo está em progresso atualmente.");
                 return;
             }
+
+            IReadOnlyList<DiscordMessage> mensagens = await ctx.Channel.GetMessagesAsync();
+
             BancoLocal.JogoDaVelha = new JogoDaVelha();
             await ctx.Channel.SendMessageAsync("O jogo da velha foi cancelado.");
+
+            await BancoLocal.JogoDaVelha.LimparRegistrosJogo(mensagens, ctx);
         }
 
         [Command("jogar")]
@@ -304,6 +310,54 @@ namespace bot_lucy_growfere.commands
             }
 
             await BancoLocal.JogoDaVelha.Jogar(ctx, posicao);
+        }
+
+        [Command("iniciarJogoAdivinhacao")]
+        public async Task IniciarJogoAdivinhacao(CommandContext ctx, int min, int max)
+        {
+            if (BancoLocal.JogoAdivinhacao.JogoIniciado)
+            {
+                await ctx.Channel.SendMessageAsync("Um jogo de adivinhação já está em progresso.");
+                return;
+            }
+
+            if (min > max || min < 0 || max < 0)
+            {
+                await ctx.Channel.SendMessageAsync("O número inicial não pode ser maior que o final e ambos precisam ser positivos. Ex: !iniciarJogoAdivinhacao 1 10");
+                return;
+            }
+
+            BancoLocal.JogoAdivinhacao = new Adivinhacao(min, max, true);
+            await ctx.Channel.SendMessageAsync("Jogo de adivinhação iniciado.");
+        }
+
+        [Command("pararJogoAdivinhacao")]
+        public async Task PararJogoAdivinhacao(CommandContext ctx)
+        {
+            if (!BancoLocal.JogoAdivinhacao.JogoIniciado)
+            {
+                await ctx.Channel.SendMessageAsync("Nenhum jogo está em progresso atualmente.");
+                return;
+            }
+
+            IReadOnlyList<DiscordMessage> mensagens = await ctx.Channel.GetMessagesAsync();
+
+            BancoLocal.JogoAdivinhacao.JogoIniciado = false;
+            await ctx.Channel.SendMessageAsync("O jogo da adivinhação foi cancelado.");
+
+            await BancoLocal.JogoAdivinhacao.LimparRegistrosJogo(mensagens, ctx);
+        }
+
+        [Command("adivinhar")]
+        public async Task Adivinhar(CommandContext ctx, int numeroAdivinhado)
+        {
+            if (!BancoLocal.JogoAdivinhacao.JogoIniciado)
+            {
+                await ctx.Channel.SendMessageAsync("Nenhum jogo de adivinhação está em progresso atualmente.");
+                return;
+            }
+
+            await BancoLocal.JogoAdivinhacao.Adivinhar(ctx, numeroAdivinhado);
         }
     }
 }

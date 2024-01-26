@@ -17,6 +17,8 @@ namespace bot_lucy_growfere.database.local
 
         public static JogoDaVelha JogoDaVelha = new JogoDaVelha();
 
+        public static Adivinhacao JogoAdivinhacao = new Adivinhacao();
+
         public static DateTime dataInicioEmpregoRefere =  new DateTime(2023, 8, 8);
 
         public static string codAudioReceberMarcelo = "0a84a499-89fb-41d6-b9c3-556e0468b483_Audio_Receber_Marcelo_5bc76888-b55b-43d9-b681-88a3780ab19c";

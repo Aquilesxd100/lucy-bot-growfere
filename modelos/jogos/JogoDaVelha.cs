@@ -1,17 +1,9 @@
-﻿using bot_lucy_growfere.comandos;
-using bot_lucy_growfere.controladores;
-using bot_lucy_growfere.database.local;
-using bot_lucy_growfere.modelos.jogos;
-using DSharpPlus;
+﻿using bot_lucy_growfere.database.local;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.Lavalink;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace bot_lucy_growfere.modelos.jogos
