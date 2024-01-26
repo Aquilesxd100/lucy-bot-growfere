@@ -71,6 +71,9 @@ namespace bot_lucy_growfere.commands
                     .AddField("!iniciarJogoVelha", "Começa um novo Jogo da Velha.")
                     .AddField("!jogar 'A1'", "Faz uma jogada no Jogo da Velha no local passado.")
                     .AddField("!pararJogoVelha", "Para imediatamente o Jogo da Velha.")
+                    .AddField("!iniciarJogoAdivinhacao '0' '100'", "Começa um novo jogo de adivinhação começando no primeiro número e terminando no segundo.")
+                    .AddField("!adivinhar '13'", "Tenta adivinhar o número sortiado no jogo de adivinhaçao.")
+                    .AddField("!pararJogoAdivinhacao", "Para imediatamente o jogo de adivinhação.")
                     .WithColor(new DiscordColor(143, 0, 255));
 
             await ctx.Channel.SendMessageAsync(embed: message);
