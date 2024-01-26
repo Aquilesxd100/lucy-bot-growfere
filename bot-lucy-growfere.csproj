@@ -185,6 +185,7 @@
     <Compile Include="comandos\ComandosVoz.cs" />
     <Compile Include="controladores\ControladorChamadaVoz.cs" />
     <Compile Include="modelos\bancoDados\BotDiscord.cs" />
+    <Compile Include="modelos\jogos\JogoDaVelha.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Secrets\Secrets.cs" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using bot_lucy_growfere.modelos.jogos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,8 @@ namespace bot_lucy_growfere.database.local
         public static string usernameLucas = "lucasdossantos0330";
 
         public static bool LucyRecebendoMarcelo = false;
+
+        public static JogoDaVelha JogoDaVelha = new JogoDaVelha();
 
         public static DateTime dataInicioEmpregoRefere =  new DateTime(2023, 8, 8);
 

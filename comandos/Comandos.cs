@@ -1,6 +1,7 @@
 ﻿using bot_lucy_growfere.comandos;
 using bot_lucy_growfere.controladores;
 using bot_lucy_growfere.database.local;
+using bot_lucy_growfere.modelos.jogos;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -8,11 +9,8 @@ using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.Remoting.Contexts;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace bot_lucy_growfere.commands
@@ -45,11 +43,12 @@ namespace bot_lucy_growfere.commands
             tempoTotalTrabalhado = tempoTotalTrabalhado.Subtract(TimeSpan.FromDays(mesesTrabalhados * 30));
 
             int diasTrabalhados = (int)(tempoTotalTrabalhado.TotalDays);
-            if (diasTrabalhados > 0) {
+            if (diasTrabalhados > 0)
+            {
                 msgTempoTrabalhado += mesesTrabalhados > 0
                     ? $" e {diasTrabalhados} dias"
                     : $" {diasTrabalhados} dias";
-            } 
+            }
 
             await ctx.Channel.SendMessageAsync($"Fernando e Lucas já trabalharam{msgTempoTrabalhado} na Refere.");
         }
@@ -68,6 +67,9 @@ namespace bot_lucy_growfere.commands
                     .AddField("!tocar", "Insira esse comando com o nome da musica que deseja tocar. (obs: se o nome tiver mais de uma palavra use _ para separa-lo)")
                     .AddField("!parar", "Usado para parar o tocar.")
                     .AddField("!tempoRefere", "Mostra quanto tempo o pessoal esta trabalhando na Refere.")
+                    .AddField("!iniciarJogoVelha", "Começa um novo Jogo da Velha.")
+                    .AddField("!jogar 'A1'", "Faz uma jogada no Jogo da Velha no local passado.")
+                    .AddField("!pararJogoVelha", "Para imediatamente o Jogo da Velha.")
                     .WithColor(new DiscordColor(143, 0, 255));
 
             await ctx.Channel.SendMessageAsync(embed: message);
@@ -142,7 +144,11 @@ namespace bot_lucy_growfere.commands
                     await ctx.Channel.DeleteMessageAsync(message);
                 }
             }
-            await ctx.Channel.SendMessageAsync($"Apaguei um total de {qtdMensagensApagadas} mensagens! 😁");
+            string nivelCansacoLucy = "😁";
+            if (qtdMensagensApagadas > 8) nivelCansacoLucy = "🥲";
+            if (qtdMensagensApagadas > 18) nivelCansacoLucy = "🥴";
+            if (qtdMensagensApagadas > 30) nivelCansacoLucy = "😵";
+            await ctx.Channel.SendMessageAsync($"Apaguei um total de {qtdMensagensApagadas} mensagens! {nivelCansacoLucy}");
         }
 
         [Command("feriados")]
@@ -253,11 +259,51 @@ namespace bot_lucy_growfere.commands
             await conexao.PlayAsync(audio);
         }
 
-        [Command("parar")]
-        public async Task Parar()
+        //[Command("parar")]
+        //public async Task Parar()
+        //{
+        //   Console.WriteLine("entrou");
+        //   ControladorChamadaVoz.conexaoVoz.DisconnectAsync();
+        //}
+
+        [Command("iniciarJogoVelha")]
+        public async Task IniciarJogoVelha(CommandContext ctx)
         {
-           Console.WriteLine("entrou");
-           ControladorChamadaVoz.conexaoVoz.DisconnectAsync();
+            if (BancoLocal.JogoDaVelha.JogoIniciado)
+            {
+                await ctx.Channel.SendMessageAsync("Um jogo da velha já está em progresso.");
+                return;
+            }
+
+            BancoLocal.JogoDaVelha.JogoIniciado = true;
+            await ctx.Channel.SendMessageAsync(
+                "Novo jogo iniciado.\nJogador  ❌  começa!\n\n"
+                + BancoLocal.JogoDaVelha.MostraCampo()
+            );
+        }
+
+        [Command("pararJogoVelha")]
+        public async Task PararJogoVelha(CommandContext ctx)
+        {
+            if (!BancoLocal.JogoDaVelha.JogoIniciado)
+            {
+                await ctx.Channel.SendMessageAsync("Nenhum jogo está em progresso atualmente.");
+                return;
+            }
+            BancoLocal.JogoDaVelha = new JogoDaVelha();
+            await ctx.Channel.SendMessageAsync("O jogo da velha foi cancelado.");
+        }
+
+        [Command("jogar")]
+        public async Task JogarJogoVelha(CommandContext ctx, string posicao)
+        {
+            if (!BancoLocal.JogoDaVelha.JogoIniciado)
+            {
+                await ctx.Channel.SendMessageAsync("Nenhum jogo está em progresso atualmente.");
+                return;
+            }
+
+            await BancoLocal.JogoDaVelha.Jogar(ctx, posicao);
         }
     }
 }
