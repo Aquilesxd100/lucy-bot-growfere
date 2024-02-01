@@ -24,10 +24,11 @@
         public string segment { get; set; }
         public string source { get; set; }
         public string target { get; set; }
-        public string quality { get; set; }
+        public int quality { get; set; }
         public string reference { get; set; }
         public int usageCount { get; set; }
         public string subject { get; set; }
+        public string translation { get; set; }
         public string createdBy { get; set; }
         public string lastUpdatedBy { get; set; }
         public string createDate { get; set; }

@@ -18,11 +18,12 @@ namespace bot_lucy_growfere.requisicoes
 
                 HttpResponseMessage resposta = await Program.HTTPclient.GetAsync(APIUrl + parametrosURL);
                 HttpContent conteudoResposta = resposta.Content;
+
                 string data = await conteudoResposta.ReadAsStringAsync();
-                
-                if(data != null)
+
+                if (data != null)
                 {
-                    MyMemoryGETResponse resConvertida = JsonConvert.DeserializeObject<MyMemoryGETResponse>(data);
+                    var resConvertida = JsonConvert.DeserializeObject<dynamic>(data);
                     if(resConvertida != null)
                     {
                         string traducaoPTBR = resConvertida.responseData.translatedText;

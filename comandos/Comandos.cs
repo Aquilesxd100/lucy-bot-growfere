@@ -350,5 +350,20 @@ namespace bot_lucy_growfere.commands
 
             await BancoLocal.JogoAdivinhacao.Adivinhar(ctx, numeroAdivinhado);
         }
+
+        [Command("testeTraducao")]
+        public async Task TesteTraducao(CommandContext ctx, string textoIngles)
+        {
+            string textoProcessado = textoIngles.Replace('_', ' ');
+
+            string textoTraduzido = await MyMemoryAPI.TraduzirENparaPTBR(textoProcessado);
+            if (textoTraduzido != null)
+            {
+                await ctx.Channel.SendMessageAsync($"Tradução de {textoIngles}: {textoTraduzido}");
+            } else
+            {
+                await ctx.Channel.SendMessageAsync("Não encontrei nenhuma tradução.");
+            }
+        }
     }
 }
