@@ -15,6 +15,8 @@ namespace bot_lucy_growfere.requisicoes
             try
             {
                 string parametrosURL = $"get?q={mensagem}&langpair=en|pt-br";
+                Console.WriteLine("Lucy: Tentei uma requisição de tradução para:");
+                Console.WriteLine(APIUrl + parametrosURL);
 
                 HttpResponseMessage resposta = await Program.HTTPclient.GetAsync(APIUrl + parametrosURL);
                 HttpContent conteudoResposta = resposta.Content;
