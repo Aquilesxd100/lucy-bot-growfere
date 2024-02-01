@@ -351,18 +351,13 @@ namespace bot_lucy_growfere.commands
             await BancoLocal.JogoAdivinhacao.Adivinhar(ctx, numeroAdivinhado);
         }
 
-        [Command("testeTraducao")]
-        public async Task TesteTraducao(CommandContext ctx, string textoIngles)
+        [Command("gerarPessoa")]
+        public async Task TesteGerarUsuario(CommandContext ctx)
         {
-            string textoProcessado = textoIngles.Replace('_', ' ');
-
-            string textoTraduzido = await MyMemoryAPI.TraduzirENparaPTBR(textoProcessado);
-            if (textoTraduzido != null)
+            RandomUserGETResponse usuario = await RandomUserAPI.GerarUsuarioAleatorio();
+            if (usuario != null)
             {
-                await ctx.Channel.SendMessageAsync($"Tradução de {textoIngles}: {textoTraduzido}");
-            } else
-            {
-                await ctx.Channel.SendMessageAsync("Não encontrei nenhuma tradução.");
+                RandomUserResult usuarioGerado = usuario.results[0];
             }
         }
     }
