@@ -1,17 +1,17 @@
 ﻿using bot_lucy_growfere.comandos;
 using bot_lucy_growfere.controladores;
 using bot_lucy_growfere.database.local;
+using bot_lucy_growfere.modelos.api;
 using bot_lucy_growfere.modelos.jogos;
+using bot_lucy_growfere.requisicoes;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace bot_lucy_growfere.commands
@@ -163,52 +163,40 @@ namespace bot_lucy_growfere.commands
             if (proximoFeriado == "prox")
                 feriadoProximo = true;
 
-            string baseURL = $"https://brasilapi.com.br/api/feriados/v1/{DateTime.Now.Year}";
-            try
+            int anoAtual = DateTime.Now.Year;
+            BrasilAPIFeriadoPorAno[] feriados = await BrasilAPI.ListarFeriadosDeUmAno(anoAtual);
+
+            if (feriados == null)
+                return;
+
+            var message = new DiscordEmbedBuilder()
+                .WithTitle(feriadoProximo ? "Esse será seu próximo Feriado Nacional 🤩" : "Esses são os Feriados Nacionais desse ano 🥳");
+
+            var feriadoEhProximoAno = true;
+            foreach (BrasilAPIFeriadoPorAno feriado in feriados)
             {
-                var client = new HttpClient();
-                var res = await client.GetAsync(baseURL);
-                var content = res.Content;
-                string data = await content.ReadAsStringAsync();
+                string dateAntiga = feriado.date;
+                var dateArray = dateAntiga.Split('-');
+                string date = String.Join("/", dateArray.Reverse());
 
-                var message = new DiscordEmbedBuilder()
-                    .WithTitle(feriadoProximo ? "Esse será seu próximo Feriado Nacional 🤩" : "Esses são os Feriados Nacionais desse ano 🥳");
-
-                var feriadoEhProximoAno = true;
-                if (data != null)
+                if (feriadoProximo)
                 {
-                    var jsonObject = JsonConvert.DeserializeObject<dynamic>(data);
-                    if (jsonObject != null)
+                    if (DateTime.Now.CompareTo(DateTime.Parse(date)) <= 0)
                     {
-                        foreach (var item in jsonObject)
-                        {
-                            string dateAntiga = item["date"];
-                            var dateArray = dateAntiga.Split('-');
-                            string date = String.Join("/", dateArray.Reverse());
-
-                            if (feriadoProximo)
-                            {
-                                if (DateTime.Now.CompareTo(DateTime.Parse(date)) <= 0)
-                                {
-                                    message.AddField($"{date}", $"{item["name"]}");
-                                    feriadoEhProximoAno = false;
-                                    break;
-                                }
-                            }
-                            else
-                                message.AddField($"{date}", $"{item["name"]}");
-                        }
+                        message.AddField($"{date}", feriado.name);
+                        feriadoEhProximoAno = false;
+                        break;
                     }
                 }
-                if (feriadoProximo && feriadoEhProximoAno)
-                    message.AddField($"01/01/{DateTime.Now.Year + 1}", "Confraternização mundial");
+                else
+                {
+                    message.AddField($"{date}", feriado.name);
+                }
+            }
+            if (feriadoProximo && feriadoEhProximoAno) 
+                message.AddField($"01/01/{DateTime.Now.Year + 1}", "Confraternização mundial");
 
-                await ctx.Channel.SendMessageAsync(embed: message);
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-            }
+            await ctx.Channel.SendMessageAsync(embed: message);
         }
 
         [Command("trocadilho")]

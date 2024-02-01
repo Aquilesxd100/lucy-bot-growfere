@@ -184,11 +184,15 @@
     <Compile Include="bancoDados\local\Trocadilhos.cs" />
     <Compile Include="comandos\ComandosVoz.cs" />
     <Compile Include="controladores\ControladorChamadaVoz.cs" />
+    <Compile Include="modelos\api\BrasilAPIModelos.cs" />
+    <Compile Include="modelos\api\MyMemoryAPIModelos.cs" />
     <Compile Include="modelos\bancoDados\BotDiscord.cs" />
     <Compile Include="modelos\jogos\Adivinhacao.cs" />
     <Compile Include="modelos\jogos\JogoDaVelha.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="requisicoes\BrasilAPI.cs" />
+    <Compile Include="requisicoes\MyMemoryAPI.cs" />
     <Compile Include="Secrets\Secrets.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,29 +1,21 @@
 ﻿using bot_lucy_growfere.commands;
-using bot_lucy_growfere.database.banco;
-using bot_lucy_growfere.database.local;
 using bot_lucy_growfere.controladores;
 using bot_lucy_growfere.Secrets;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace bot_lucy_growfere
 {
     internal class Program
     {
         public static DiscordClient Client { get; set; }
+
+        public static HttpClient HTTPclient = new HttpClient();
         public static CommandsNextExtension Commands { get; set; }
 
         static async Task Main(string[] args)
